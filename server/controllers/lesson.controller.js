@@ -38,7 +38,7 @@ const create = async (req, res) => {
 
 const list = async (req, res) => {
     try {
-      let lessons = await Lesson.find().select('header updated created _id')
+      let lessons = await Lesson.find().select('updated created _id')
       res.json(lessons)
     } catch (err) {
       return res.status(400).json({

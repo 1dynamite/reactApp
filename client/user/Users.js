@@ -41,10 +41,8 @@ export default function Users() {
       }
       
     })
-    console.log("useEffect called!")
 
     return function cleanup(){
-      console.log("abortController called!")
       abortController.abort()
     }
   }, [])
