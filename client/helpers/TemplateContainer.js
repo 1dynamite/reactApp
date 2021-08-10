@@ -5,7 +5,7 @@ import Button from '@material-ui/core/Button';
 import Grid from '@material-ui/core/Grid';
 
 
-export default function TemplateContainer({inputs, breakpoints = {sm: 12, md: 6}}) {
+export default function TemplateContainer({templates, labels, breakpoints = {sm: 12, md: 6}}) {
   const carouselRef = useRef({});
   const [templateHeight, setHeight] = useState('auto');
 
@@ -19,14 +19,32 @@ export default function TemplateContainer({inputs, breakpoints = {sm: 12, md: 6}
         container
         direction="row"
     >
-        <Grid item xs={12} sm={breakpoints.sm} md={breakpoints.md}>
-            <div ref={carouselRef}>
-                <TemplateItem
-                    textFields={inputs}
-                    style={{height: templateHeight}}
-                />
-            </div>
-        </Grid>
+        {templates.map((template, index) => {
+            return (
+                <Grid 
+                    item xs={12} 
+                    sm={breakpoints.sm} 
+                    md={breakpoints.md}
+                    key={index}
+                >
+                    {index == 0 ? (
+                        <div ref={carouselRef}>
+                            <TemplateItem
+                                template={template}
+                                labels={labels}
+                                style={{height: templateHeight}}
+                            />
+                        </div>
+                    ) : (
+                        <TemplateItem
+                            template={template}
+                            labels={labels}
+                            style={{height: templateHeight}}
+                        />
+                    )}
+                </Grid>
+            );
+        })}
         <Grid item xs={12} sm={breakpoints.sm} md={breakpoints.md}>
             <Button 
                 fullWidth

@@ -20,7 +20,7 @@ const useStyles = makeStyles((theme) => ({
     }
   }));
 
-export default function TemplateItem({textFields}) {
+export default function TemplateItem({template, labels, delIcon=true}) {
     const classes = useStyles();
     const [deleteIcon, setIcon] = useState(false);
 
@@ -29,27 +29,52 @@ export default function TemplateItem({textFields}) {
     }
 
     const mouseOver = () => {
-        setIcon(true)
+        setIcon(delIcon)
     }
 
     const mouseOut = () => {
         setIcon(false)
     }
+
+    const handleChange = (e) => {
+
+    }
     
     return (
-    <Paper className={classes.root} variant="outlined" onMouseOver={mouseOver} onMouseOut={mouseOut}>
-        {textFields.map((label, index) => {
-            return (
-                <TextField
-                    key={index}
-                    label={label}
-                    className={classes.textfield}  
-                    variant="filled" 
-                    fullWidth 
-                    size="small" 
-                />
-            )
-        })}
+    <Paper 
+        className={classes.root} 
+        variant="outlined" 
+        onMouseOver={mouseOver} 
+        onMouseOut={mouseOut}
+    >
+        {typeof template == "string" ? (
+            <TextField
+                label={labels}
+                value={template}
+                className={classes.textfield}  
+                variant="filled" 
+                fullWidth 
+                size="small"
+                onChange={handleChange}
+            />
+        ) : (
+            Object.entries(template).map(([property, value]) => {
+                return (
+                    <TextField
+                        key={property}
+                        name={property}
+                        label={labels[property]}
+                        value={value}
+                        className={classes.textfield}  
+                        variant="filled" 
+                        fullWidth 
+                        size="small" 
+                        onChange={handleChange}
+                    />
+                )
+            })
+        )
+        }
         <IconButton 
             className={classes.iconButton}
             onClick={clickButton} 

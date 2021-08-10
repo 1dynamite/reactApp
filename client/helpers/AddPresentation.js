@@ -38,91 +38,127 @@ function getSteps() {
   return ['Enter a unique lesson ID', 'Introduction', 'Listening', 'Vocabulary', 'Reading'];
 }
 
-const IdStep = ({id}) => {
-    return (
-        <TextField 
+const IdStep = ({id = undefined, label = undefined}) => {
+    const label_ = label !== undefined ? label : 'Type here...'
+    const returnObj = id !== undefined ? (
+        <TextField
             value={id} 
-            label="Lesson ID"
+            label={label_}
             variant="filled" 
             size="small"
             fullWidth
         />
-    );
+    ) : ''
+
+    return returnObj;
 }
-const IntroStep = ({classes, inputsExs, introduction}) => {
+const IntroStep = ({introduction, carousel, exercises}) => {
+    const classes = useStyles();
     return (
         <div className={classes.step}>
             <MyAccordion heading='Carousel'>
-                <TemplateContainer inputs={["Image path", "Title", "Description"]}/>
+                <TemplateContainer templates={introduction.carousel} labels={carousel}/>
             </MyAccordion>
             <MyAccordion heading='Exercises'>
-                <TemplateContainer inputs={inputsExs}/>
+                <TemplateContainer templates={introduction.exercises} labels={exercises}/>
             </MyAccordion>
         </div>
     );
 }
-const ListeningStep = ({classes, inputsExs}) => {
+const ListeningStep = ({listening, media, exercises}) => {
+    const classes = useStyles();
     return (
         <div className={classes.step}>
             <MyAccordion heading='Media'>
-                <TemplateItem textFields={["Media path"]}/>
+                <TemplateItem template={listening.video} labels={media} delIcon={false}/>
             </MyAccordion>
             <MyAccordion heading='Exercises'>
-                <TemplateContainer inputs={inputsExs}/>
+                <TemplateContainer templates={listening.exercises} labels={exercises}/>
             </MyAccordion>
         </div>
     );
 }
-const VocabStep = ({classes, inputsExs}) => {
+const VocabStep = ({vocabulary, vocabPanel, exercises}) => {
+    const classes = useStyles();
     return (
         <div className={classes.step}>
             <MyAccordion heading='Words & Defintions'>
                 <MyAccordion heading='Words'>
-                    <TemplateContainer inputs={["A word"]} breakpoints={{sm: 6, md: 3}}/>
+                    <TemplateContainer 
+                        templates={vocabulary.vocabPanel.words} 
+                        labels={vocabPanel.words} 
+                        breakpoints={{sm: 6, md: 3}}
+                    />
                 </MyAccordion>
                 <MyAccordion heading='Definitions'>
-                    <TemplateContainer inputs={["A word", "Definition"]}/>
+                    <TemplateContainer 
+                        templates={vocabulary.vocabPanel.definitions} 
+                        labels={vocabPanel.definitions}
+                    />
                 </MyAccordion>
             </MyAccordion>
             <MyAccordion heading='Exercises'>
-                <TemplateContainer inputs={inputsExs}/>
+                <TemplateContainer templates={vocabulary.exercises} labels={exercises}/>
             </MyAccordion>
         </div>
     );
 }
-const ReadingStep = ({classes, inputsExs}) => {
+const ReadingStep = ({reading, passage, exercises}) => {
+    const classes = useStyles();
     return (
         <div className={classes.step}>
             <MyAccordion heading='Passage'>
-                <TemplateItem textFields={["Title", "Subtitle", "Body"]}/>
+                <TemplateItem template={reading.passage} labels={passage} delIcon={false}/>
             </MyAccordion>
             <MyAccordion heading='Exercises'>
-                <TemplateContainer inputs={inputsExs}/>
+                <TemplateContainer templates={reading.exercises} labels={exercises}/>
             </MyAccordion>
         </div>
     );
 }
 
-function getStepContent(step, lesson) {
-    const inputsExs = ["Header", "Body"]
-    const classes = useStyles();
+function getStepContent(step, lesson, labels) {
   switch (step) {
     case 0:
-        return lesson.hasOwnProperty('_id') ? <IdStep id={lesson._id}/> : '';
+        return <IdStep id={lesson._id} label={labels._id}/>;
     case 1:
-        return <IntroStep classes={classes} inputsExs={inputsExs}/>;
+        return (
+            <IntroStep 
+                introduction={lesson.sections.introduction} 
+                carousel={labels.sections.introduction.carousel}
+                exercises={labels.sections.exercises}
+            />
+        );
     case 2:
-        return <ListeningStep classes={classes} inputsExs={inputsExs}/>;
+        return (
+            <ListeningStep 
+                listening={lesson.sections.listening}
+                media={labels.sections.listening.video}
+                exercises={labels.sections.exercises}
+            />
+        );
     case 3:
-        return <VocabStep classes={classes} inputsExs={inputsExs}/>;
+        return (
+            <VocabStep 
+                vocabulary={lesson.sections.vocabulary} 
+                vocabPanel={labels.sections.vocabulary.vocabPanel}
+                exercises={labels.sections.exercises}
+            />
+        );
     case 4:
-        return <ReadingStep classes={classes} inputsExs={inputsExs}/>;
+        return (
+            <ReadingStep 
+                reading={lesson.sections.reading}
+                passage={labels.sections.reading.passage}
+                exercises={labels.sections.exercises}
+            />
+        );
     default:
       return 'Unknown step';
   }
 }
 
-export default function AddPresentation({lesson}) {
+export default function AddPresentation({lesson, labels}) {
   const classes = useStyles();
   const [activeStep, setActiveStep] = React.useState(0);
   const steps = getSteps();
@@ -150,7 +186,7 @@ export default function AddPresentation({lesson}) {
           <Step key={label}>
             <StepLabel>{label}</StepLabel>
             <StepContent>
-              {getStepContent(index, lesson)}
+              {getStepContent(index, lesson, labels)}
               <div className={classes.actionsContainer}>
                 <div>
                   <Button
