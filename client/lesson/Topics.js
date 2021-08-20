@@ -14,6 +14,7 @@ import {Link} from 'react-router-dom'
 import {list} from './api-lesson.js'
 import AddIcon from '@material-ui/icons/Add'
 import Button from '@material-ui/core/Button'
+import auth from '../auth/auth-helper'
 
 const useStyles = makeStyles(theme => ({
   root: theme.mixins.gutters({
@@ -33,10 +34,14 @@ const useStyles = makeStyles(theme => ({
 export default function Topics() { 
   const classes = useStyles()
   const [topics, setTopics] = useState([])
+  const [isAdmin, setIsAdmin] = useState(false)
   
   useEffect(() => {
     const abortController = new AbortController()
     const signal = abortController.signal
+    auth.isAdmin().then((data) => {
+      setIsAdmin(data)
+    })
 
     list(signal).then((data) => {
       if (data && data.error) {
@@ -57,21 +62,25 @@ export default function Topics() {
         All Topics
       </Typography>
       <List dense>
-      <Link to="/topics/add/">
-        <Button
-          className = {classes.addLesson}
-          variant="contained"
-          color="primary"
-          size="medium"
-          fullWidth={true}
-          startIcon={<AddIcon />}
-        >
-          Add a new lesson
-        </Button>
-      </Link>
+        {
+          isAdmin ? (
+            <Link to="/topics/add/">
+              <Button
+                className = {classes.addLesson}
+                variant="contained"
+                color="primary"
+                size="medium"
+                fullWidth={true}
+                startIcon={<AddIcon />}
+              >
+                Add a new lesson
+              </Button>
+            </Link>
+          ) : ''
+        }
        {topics.map((item, i) => {
          let topic = item._id.charAt(0).toUpperCase() + item._id.slice(1);
-        return <Link to={"/topic/" + item._id} key={i}>
+        return <Link to={"/topic/actions/" + item._id} key={i}>
                   <ListItem button>
                     <ListItemAvatar>
                       <Avatar>{topic.charAt(0)}</Avatar>

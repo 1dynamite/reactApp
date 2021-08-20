@@ -38,8 +38,11 @@ function getSteps() {
   return ['Enter a unique lesson ID', 'Introduction', 'Listening', 'Vocabulary', 'Reading'];
 }
 
-const IdStep = ({id = undefined, label = undefined}) => {
+const IdStep = ({id = undefined, label = undefined, ...props}) => {
     const label_ = label !== undefined ? label : 'Type here...'
+    const handleChange = (e) => {
+      props.handleChange({_id: e.target.value})
+    }
     const returnObj = id !== undefined ? (
         <TextField
             value={id} 
@@ -47,39 +50,80 @@ const IdStep = ({id = undefined, label = undefined}) => {
             variant="filled" 
             size="small"
             fullWidth
+            onChange={handleChange}
         />
     ) : ''
 
     return returnObj;
 }
-const IntroStep = ({introduction, carousel, exercises}) => {
+const IntroStep = ({introduction, carousel, exercises, ...props}) => {
     const classes = useStyles();
+    const handleChangeCarousel = (nextState) => {
+      props.handleChange({carousel: nextState})
+    }
+    const handleChangeExercises = (nextState) => {
+      props.handleChange({exercises: nextState})
+    }
     return (
         <div className={classes.step}>
             <MyAccordion heading='Carousel'>
-                <TemplateContainer templates={introduction.carousel} labels={carousel}/>
+                <TemplateContainer 
+                  templates={introduction.carousel} 
+                  labels={carousel}
+                  handleChange={handleChangeCarousel}
+                />
             </MyAccordion>
             <MyAccordion heading='Exercises'>
-                <TemplateContainer templates={introduction.exercises} labels={exercises}/>
+                <TemplateContainer 
+                  templates={introduction.exercises} 
+                  labels={exercises}
+                  handleChange={handleChangeExercises}
+                />
             </MyAccordion>
         </div>
     );
 }
-const ListeningStep = ({listening, media, exercises}) => {
+const ListeningStep = ({listening, media, exercises, ...props}) => {
     const classes = useStyles();
+
+    const handleChangeVideo = (nextState) => {
+      props.handleChange({video: nextState.value})
+    }
+    const handleChangeExercises = (nextState) => {
+      props.handleChange({exercises: nextState})
+    }
     return (
         <div className={classes.step}>
             <MyAccordion heading='Media'>
-                <TemplateItem template={listening.video} labels={media} delIcon={false}/>
+                <TemplateItem 
+                  template={listening.video} 
+                  labels={media} 
+                  delIcon={false}
+                  handleChange={handleChangeVideo}
+                />
             </MyAccordion>
             <MyAccordion heading='Exercises'>
-                <TemplateContainer templates={listening.exercises} labels={exercises}/>
+                <TemplateContainer 
+                  templates={listening.exercises} 
+                  labels={exercises}
+                  handleChange={handleChangeExercises}
+                />
             </MyAccordion>
         </div>
     );
 }
-const VocabStep = ({vocabulary, vocabPanel, exercises}) => {
+const VocabStep = ({vocabulary, vocabPanel, exercises, ...props}) => {
     const classes = useStyles();
+
+    const handleChangeWords = (nextState) => {
+      props.handleChange({vocabPanel: {words: nextState}})
+    }
+    const handleChangeDefinitions = (nextState) => {
+      props.handleChange({vocabPanel: {definitions: nextState}})
+    }
+    const handleChangeExercises = (nextState) => {
+      props.handleChange({exercises: nextState})
+    }
     return (
         <div className={classes.step}>
             <MyAccordion heading='Words & Defintions'>
@@ -88,45 +132,80 @@ const VocabStep = ({vocabulary, vocabPanel, exercises}) => {
                         templates={vocabulary.vocabPanel.words} 
                         labels={vocabPanel.words} 
                         breakpoints={{sm: 6, md: 3}}
+                        handleChange={handleChangeWords}
                     />
                 </MyAccordion>
                 <MyAccordion heading='Definitions'>
                     <TemplateContainer 
                         templates={vocabulary.vocabPanel.definitions} 
                         labels={vocabPanel.definitions}
+                        handleChange={handleChangeDefinitions}
                     />
                 </MyAccordion>
             </MyAccordion>
             <MyAccordion heading='Exercises'>
-                <TemplateContainer templates={vocabulary.exercises} labels={exercises}/>
+                <TemplateContainer 
+                  templates={vocabulary.exercises} 
+                  labels={exercises}
+                  handleChange={handleChangeExercises}
+                />
             </MyAccordion>
         </div>
     );
 }
-const ReadingStep = ({reading, passage, exercises}) => {
+const ReadingStep = ({reading, passage, exercises, ...props}) => {
     const classes = useStyles();
+
+    const handleChangePassage = (nextState) => {
+      props.handleChange({passage: nextState.value})
+    }
+    const handleChangeExercises = (nextState) => {
+      props.handleChange({exercises: nextState})
+    }    
     return (
         <div className={classes.step}>
             <MyAccordion heading='Passage'>
-                <TemplateItem template={reading.passage} labels={passage} delIcon={false}/>
+                <TemplateItem 
+                  template={reading.passage} 
+                  labels={passage} 
+                  delIcon={false}
+                  handleChange={handleChangePassage}
+                />
             </MyAccordion>
             <MyAccordion heading='Exercises'>
-                <TemplateContainer templates={reading.exercises} labels={exercises}/>
+                <TemplateContainer 
+                  templates={reading.exercises} 
+                  labels={exercises}
+                  handleChange={handleChangeExercises}
+                />
             </MyAccordion>
         </div>
     );
 }
 
-function getStepContent(step, lesson, labels) {
+function getStepContent(step, lesson, labels, handleChange, handleId) {
+  const handleChangeIntro = (nextState) => {
+    handleChange({introduction: nextState})
+  }
+  const handleChangeListening = (nextState) => {
+    handleChange({listening: nextState})
+  }
+  const handleChangeVocabulary = (nextState) => {
+    handleChange({vocabulary: nextState})
+  }
+  const handleChangeReading = (nextState) => {
+    handleChange({reading: nextState})
+  }
   switch (step) {
     case 0:
-        return <IdStep id={lesson._id} label={labels._id}/>;
+        return <IdStep id={lesson._id} label={labels._id} handleChange={handleId}/>;
     case 1:
         return (
             <IntroStep 
                 introduction={lesson.sections.introduction} 
                 carousel={labels.sections.introduction.carousel}
                 exercises={labels.sections.exercises}
+                handleChange={handleChangeIntro}
             />
         );
     case 2:
@@ -135,6 +214,7 @@ function getStepContent(step, lesson, labels) {
                 listening={lesson.sections.listening}
                 media={labels.sections.listening.video}
                 exercises={labels.sections.exercises}
+                handleChange={handleChangeListening}
             />
         );
     case 3:
@@ -143,6 +223,7 @@ function getStepContent(step, lesson, labels) {
                 vocabulary={lesson.sections.vocabulary} 
                 vocabPanel={labels.sections.vocabulary.vocabPanel}
                 exercises={labels.sections.exercises}
+                handleChange={handleChangeVocabulary}
             />
         );
     case 4:
@@ -151,6 +232,7 @@ function getStepContent(step, lesson, labels) {
                 reading={lesson.sections.reading}
                 passage={labels.sections.reading.passage}
                 exercises={labels.sections.exercises}
+                handleChange={handleChangeReading}
             />
         );
     default:
@@ -158,7 +240,7 @@ function getStepContent(step, lesson, labels) {
   }
 }
 
-export default function AddPresentation({lesson, labels}) {
+export default function AddPresentation({lesson, labels, ...props}) {
   const classes = useStyles();
   const [activeStep, setActiveStep] = React.useState(0);
   const steps = getSteps();
@@ -175,8 +257,11 @@ export default function AddPresentation({lesson, labels}) {
     setActiveStep(0);
   };
 
+  const handleChange = (nextState) => {
+    props.handleChange({sections: nextState})
+  }
   const handleSubmit = () => {
-      
+      props.handleSubmit();
   }
 
   return (
@@ -186,7 +271,7 @@ export default function AddPresentation({lesson, labels}) {
           <Step key={label}>
             <StepLabel>{label}</StepLabel>
             <StepContent>
-              {getStepContent(index, lesson, labels)}
+              {getStepContent(index, lesson, labels, handleChange, props.handleChange)}
               <div className={classes.actionsContainer}>
                 <div>
                   <Button
@@ -212,9 +297,9 @@ export default function AddPresentation({lesson, labels}) {
       </Stepper>
       {activeStep === steps.length && (
         <Paper square elevation={0} className={classes.resetContainer}>
-          <Typography>You&apos;ve reached the end - you can now submit!</Typography>
+          <Typography color={props.message.color}>{props.message.body}</Typography>
           <Button onClick={handleReset} className={classes.button}>
-            Reset
+            BACK
           </Button>
           <Button
             variant="contained"

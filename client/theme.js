@@ -34,6 +34,7 @@ const theme = createTheme({
       dark: '#c60055',
       contrastText: '#000',
     },
+      gray: '#f1f1f1',
       openTitle: '#3f4771',
       protectedTitle: pink['400'],
       type: 'light',

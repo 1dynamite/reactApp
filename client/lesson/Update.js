@@ -1,11 +1,12 @@
-import React, {useState} from 'react';
+import React, {useState, useEffect} from 'react';
 import AddPresentation from '../helpers/AddPresentation'
 import merge from 'lodash/merge'
-import {create} from './api-lesson'
+import {update} from './api-lesson'
 import auth from './../auth/auth-helper'
 import {Redirect} from 'react-router-dom'
+import {read} from './api-lesson'
 
-export default function() {
+export default function({match}) {
     const values = {
         _id: '',
         sections: {
@@ -94,6 +95,22 @@ export default function() {
         color:'initial'
     })
     const [redirectTrue, setRedirect] = useState(false);
+    
+    useEffect(() => {
+        const abortController = new AbortController()
+        const signal = abortController.signal
+    
+        read(signal, match.params.lessonId).then((data) => {
+          if (data && !data.error) {
+            setLesson(data)
+          }
+        })
+    
+        return function cleanup(){
+          abortController.abort()
+        }
+    
+    }, [match.params.lessonId])
 
     const handleChange = (nextState) => {
         let old = {...lesson};
@@ -101,7 +118,7 @@ export default function() {
     }
     const handleSubmit = () => {
         setMessage({body: "Loading..."});
-        create(lesson, auth.isAuthenticated().token).then((data) => {
+        update(lesson, auth.isAuthenticated().token).then((data) => {
             if(data && data.error)
                 setMessage({body: data.error, color:'secondary'})
             else setRedirect(true);

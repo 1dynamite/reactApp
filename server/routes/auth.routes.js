@@ -8,4 +8,7 @@ router.route('/auth/signin')
 router.route('/auth/signout')
   .get(authCtrl.signout)
 
+router.route('/api/isadmin')
+  .get(authCtrl.requireSignin, authCtrl.isAdmin, (req, res) => res.json(true))
+
 export default router

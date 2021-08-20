@@ -8,7 +8,8 @@ const CommentSchema = new mongoose.Schema({
     },
     body: String,
     userId: String,
-    lessonId: String
+    lessonId: String,
+    username: String
 });
 
 export default mongoose.model('Comment', CommentSchema);

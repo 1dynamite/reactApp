@@ -20,12 +20,12 @@ const useStyles = makeStyles((theme) => ({
     }
   }));
 
-export default function TemplateItem({template, labels, delIcon=true}) {
+export default function TemplateItem({template, labels, delIcon=true, ...props}) {
     const classes = useStyles();
     const [deleteIcon, setIcon] = useState(false);
 
     const clickButton = () => {
-
+        props.delete(props.index)
     }
 
     const mouseOver = () => {
@@ -37,7 +37,15 @@ export default function TemplateItem({template, labels, delIcon=true}) {
     }
 
     const handleChange = (e) => {
-
+        let nextState = {};
+        if(props.hasOwnProperty('index'))
+            nextState.index = props.index;
+        if(typeof template == 'string')
+            nextState.value = e.target.value;
+        else {
+            nextState.value = {[e.target.name]: e.target.value}
+        }
+        props.handleChange(nextState);
     }
     
     return (
@@ -59,6 +67,9 @@ export default function TemplateItem({template, labels, delIcon=true}) {
             />
         ) : (
             Object.entries(template).map(([property, value]) => {
+                let multiline = false;
+                if(property === 'body')
+                    multiline = true;
                 return (
                     <TextField
                         key={property}
@@ -70,6 +81,8 @@ export default function TemplateItem({template, labels, delIcon=true}) {
                         fullWidth 
                         size="small" 
                         onChange={handleChange}
+                        multiline={multiline}
+                        rows={8}
                     />
                 )
             })

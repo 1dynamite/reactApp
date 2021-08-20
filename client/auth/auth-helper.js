@@ -1,6 +1,22 @@
 import { signout } from './api-auth.js'
 
 const auth = {
+  async isAdmin() {
+    if (typeof window == "undefined")
+      return false
+   if(!sessionStorage.getItem('jwt'))
+    return false;
+    let data = await fetch('/api/isadmin/', {
+      method: 'GET',
+      headers: {
+        'Authorization': 'Bearer ' + JSON.parse(sessionStorage.getItem('jwt')).token
+      }
+    }).then((data) => data.json())
+
+    if(data === true)
+      return true;
+    return false;
+  },
   isAuthenticated() {
     if (typeof window == "undefined")
       return false

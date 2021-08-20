@@ -2,13 +2,23 @@ import mongoose from 'mongoose';
 import { SectionSchema } from '../schemas/lesson.schemas';
 
 const validator = function(val){
-  const hasVideo = val.listening && val.listening.video && (val.listening.video.length != 0 );
-  const hasVocab = val.vocabulary && val.vocabulary.vocabPanel && val.vocabulary.vocabPanel.words && 
-    (val.vocabulary.vocabPanel.words.length != 0 );
-  const hasPassage = val.reading && val.reading.passage && val.reading.passage.body && 
-    (val.reading.passage.body.length != 0 );
-
-  return Boolean(hasVideo || hasVocab || hasPassage);
+  try{
+    const hasVideo = val.listening.video.length !== 0;
+    let hasVocab = false;
+    for(const i of val.vocabulary.vocabPanel.words)
+    {
+      hasVocab = hasVocab || i.length !== 0;
+      if(hasVocab)
+        return true;
+    }
+    
+    const hasPassage = val.reading.passage.body.length !== 0;
+    return (hasVideo || hasVocab || hasPassage);
+  } catch(err){
+    return false;
+  }
+  
+  
 };
 
 const LessonSchema = new mongoose.Schema({

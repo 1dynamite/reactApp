@@ -7,9 +7,15 @@ import Signin from './auth/Signin'
 import EditProfile from './user/EditProfile'
 import Profile from './user/Profile'
 import PrivateRoute from './auth/PrivateRoute'
+import ProtectedRoute from './auth/ProtectedRoute'
+import ProtectedRouteAdd from './auth/ProtectedRouteAdd'
 import Menu from './core/Menu'
 import Topics from './lesson/Topics'
 import AddLesson from './lesson/Add'
+import Actions from './lesson/Action'
+import Update from './lesson/Update'
+import Lesson from './lesson/Lesson'
+import Example from './comments/Comments'
 
 const MainRouter = () => {
     return (<div>
@@ -21,8 +27,12 @@ const MainRouter = () => {
         <Route path="/signin" component={Signin}/>
         <PrivateRoute path="/user/edit/:userId" component={EditProfile}/>
         <Route path="/user/:userId" component={Profile}/>
-        <Route path="/topics/add" component={AddLesson}/>
+        <ProtectedRouteAdd path="/topics/add" component={AddLesson}/>
         <Route path="/topics" component={Topics}/>
+        <ProtectedRoute path="/topic/edit/:lessonId" component={Update}/>
+        <ProtectedRoute path="/topic/actions/:lessonId" component={Actions}/>
+        <Route path="/topic/:lessonId" component={Lesson}/>
+        <Route path="/carousel" component={Example}/>
       </Switch>
     </div>)
 }
